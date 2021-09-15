@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>List Drag N Drop with Last Array And New Array</title>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+  <link rel="stylesheet" href="https://jqueryui.com/resources/demos/style.css">
+  <style>
+  #sortable { list-style-type: none; padding: 0; }
+  #sortable li { display: inline; margin: 20px; padding: 0.4em; padding-left: 0.5 em; font-size: 1.4em; height: 18px; }
+  #sortable li span { display: inherit; }
+  /* #sortable li span { position: absolute; margin-left: -1.3em; } */
+  .highlights{
+	background-color: red;
+  }
+
+  .close {
+    cursor: pointer;
+    position: block;
+    top: 50%;
+    right: 0%;
+    padding: 12px 16px;
+    transform: translate(0%, -50%);
+    }
+
+    .close:hover {background: #bbb;}
+  </style>
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>  
+</head>
+<body>
+<div style="border-style: solid; border-color: black;">
+  <ul id="sortable">
+    
+  </ul>
+</div>
+
+
+<div style="border-style: solid; border-color: black;">
+    <ul id="subtitle">
+      
+    </ul>
+  </div>
+
+  <div>
+    Player : <span id="lastarray"></span>
+  </div>
+
+  <div>
+    Formation Player : <span id="newarray"></span>
+  </div>
+
+<script>
+    var topeleven = []
+    var positioneleven = []
+	const drag = (ev) =>  {
+        ev.dataTransfer.setData("text", ev.target.id);
+        // console.log(ev.target);
+        // console.log(ev);
+    }
+
+    const drop = (ev) => {
+        ev.preventDefault();
+        console.log(ev.target);
+        var data = ev.dataTransfer.getData("text");
+        // console.log($("#"+data).attr('data-nama'))
+        // ev.target.html("<div>"+$("#"+data).attr('data-nama')+"</div>");
+        if (ev.target.id){
+            var idposisi = $("#"+data).attr("data-positionid");
+            var formasid = $('#'+ev.target.id).attr('data-formasiid');
+            console.log(topeleven)
+            var index = topeleven.findIndex(x => x.no ===idposisi);
+            var indexposisi = positioneleven.findIndex(x => x.no ===formasid);
+            console.log(index)
+            console.log(idposisi)
+            var formasiplayer = topeleven[index].sp;
+            var formasi = $('#'+ev.target.id).attr('formasi');
+            var cekada = 0;
+            for (var l=0; l<formasiplayer.length; l++ ){
+                if (formasi==formasiplayer[l]){
+                    positioneleven[indexposisi].idpemain = idposisi
+                    positioneleven[indexposisi].name = $("#"+data).attr('data-nama')
+                    // $('#'+ev.target.id).text(formasi+" "+$("#"+data).attr('data-nama'));
+                    $('#'+ev.target.id).html(formasi+" "+$("#"+data).attr('data-nama')+ ' '+'<span class="close" style="display:hidden;" id="close'+formasid+'" onclick="hapusPemain('+formasid+','+idposisi+',`'+formasi+'`,'+indexposisi+')">x</span>');
+                    $("#"+data).hide()
+                    cekada = 1;
+                    $("#lastarray").text(JSON.stringify(topeleven))
+                    $("#newarray").text(JSON.stringify(positioneleven))
+                    // $('#close'+formasid).show()
+                }
+            }
+            if (cekada==0){
+                alert("Formasi yang dipilih "+formasi+" posisi player anda "+JSON.stringify(formasiplayer))
+            }
+        }
+    }
+
+    function hapusPemain(id,posisiid,formasi,indexformasi){
+        $('#player'+posisiid).show()
+        positioneleven[indexformasi].name = "";
+        positioneleven[indexformasi].idpemain = "";
+        $('#formation'+id).html(formasi)
+        // $("#lastarray").text(JSON.stringify(topeleven))
+        $("#newarray").text(JSON.stringify(positioneleven))
+        console.log(positioneleven)
+    }
+
+    function allowDrop(ev) {
+    //    console.log(ev.target)
+       ev.preventDefault();
+    }
+  $( function() {    
+
+    const arrayMoveMutateMethod = (array, from, to) => {
+        array.splice(to < 0 ? array.length + to : to, 0, array.splice(from, 1)[0]);
+    };
+    
+    const arrayMoveMethod = (array, from, to) => {
+        array = array.slice();
+        arrayMoveMutateMethod(array, from, to);
+        return array;
+    };
+    topeleven = [
+		{no:"1",name:"Kasper Schmeichel",position:"goalkeeper",sp:["GK"]},
+		{no:"2",name:"Trent Alexander Arnold",position:"back",sp:["RB"]},
+		{no:"3",name:"Raphael Varane",position:"back",sp:["CB"]},
+		{no:"4",name:"Virgil Van Dijk",position:"back",sp:["CB"]},
+		{no:"5",name:"Luke Shaw",position:"back",sp:["LB"]},
+		{no:"6",name:"Muhammad Salah",position:"mid",sp:["AMF","SS","RMF"]},
+		{no:"7",name:"Bruno Fernandes",position:"mid",sp:["AMF","SS","CMF"]},
+		{no:"8",name:"Paul Pogba",position:"mid",sp:["AMF","CMF"]},
+		{no:"9",name:"Cristiano Ronaldo",position:"mid",sp:["AMF","SS","RMF","LMF"]},
+		{no:"10",name:"Edison Cavani",position:"forward",sp:["SS","CF",]},
+		{no:"11",name:"Gabriel Jesus",position:"forward",sp:["CF","SS",]},
+	]
+    positioneleven = [
+		{no:"1",name:"",position:"goalkeeper",sp:"GK",idpemain:""},
+		{no:"2",name:"",position:"back",sp:"RB",idpemain:""},
+		{no:"3",name:"",position:"back",sp:"CB",idpemain:""},
+		{no:"4",name:"",position:"back",sp:"CB",idpemain:""},
+		{no:"5",name:"",position:"back",sp:"CB",idpemain:""},
+		{no:"6",name:"",position:"back",sp:"LB",idpemain:""},
+		{no:"7",name:"",position:"mid",sp:"RMF",idpemain:""},
+		{no:"8",name:"",position:"mid",sp:"CMF",idpemain:""},
+		{no:"9",name:"",position:"mid",sp:"DMF",idpemain:""},
+		{no:"10",name:"",position:"mid",sp:"CMF",idpemain:""},
+		{no:"11",name:"",position:"mid",sp:"LMF",idpemain:""},
+		{no:"12",name:"",position:"mid",sp:"AMF",idpemain:""},
+		{no:"13",name:"",position:"forward",sp:"RWF",idpemain:""},
+		{no:"14",name:"",position:"forward",sp:"SS",idpemain:""},
+		{no:"15",name:"",position:"forward",sp:"CF",idpemain:""},
+		{no:"16",name:"",position:"forward",sp:"SS",idpemain:""},
+		{no:"17",name:"",position:"forward",sp:"LWF",idpemain:""},
+	]
+    var position = [{number:1,position:"goalkeeper",sp:["GK"]},{number:5,position:"back",sp:["CB","RB","LB"]},{number:6,position:"mid",sp:["DMF","CMF","AMF,LMF","RMF"]},{number:5,position:"forward",sp:["CF","SS","LWF","RWF"]}]
+    var listtopeleven = ""
+	for (var i=0; i<topeleven.length; i++){
+		listtopeleven += '<li class="ui-state-default" draggable="true" id="player'+topeleven[i].no+'" data-nama="'+topeleven[i].name+'" data-position="'+topeleven[i].sp[0]+'" data-positionid="'+topeleven[i].no+'" ondragstart="drag(event)"><span>'+topeleven[i].sp[0]+'</span> '+ topeleven[i].name+'</li>';
+	}
+	$("#subtitle").html(listtopeleven);    
+	var listtop = ""
+	for (var j=0; j<position.length; j++){
+        listtop += '<div style="margin:20px;text-align:center;">'
+        var positionnumber = 0;
+        var arrayposition = [];
+        for (var i=0; i<positioneleven.length; i++){
+            if (positioneleven[i].position==position[j].position){
+                arrayposition.push(positioneleven[i])
+            }
+            positionnumber++;
+        }
+        for(var m=0; m<arrayposition.length; m++){
+            listtop += '<li class="ui-state-default" id="formation'+arrayposition[m].no+'" formasi="'+arrayposition[m].sp+'" ondrop="drop(event)" data-formasiid="'+arrayposition[m].no+'"  ondragover="allowDrop(event)">'+arrayposition[m].sp+' '+arrayposition[m].name+'</li>';            
+        }
+        listtop += "</div>"
+	}
+	$("#sortable").html(listtop);
+    // $('#sortable div').sortable({
+    //     start: function(event, ui) {
+    //         var start_pos = ui.item.index();
+    //         ui.item.data('start_pos', start_pos);
+    //         $("#lastarray").text(JSON.stringify(topeleven))
+    //     },
+    //     change: function(event, ui) {
+    //         var start_pos = ui.item.data('start_pos');
+    //         var index = ui.placeholder.index();
+    //         if (start_pos < index) {
+    //             $('#sortable li:nth-child(' + index + ')').addClass('highlights');
+    //         } else {
+    //             $('#sortable li:eq(' + (index + 1) + ')').addClass('highlights');
+    //         }
+    //     },
+    //     update: function(event, ui) {
+    //         var start_pos = ui.item.data('start_pos');
+    //         var index = ui.item.index();
+    //         console.log(index)
+    //         topeleven = arrayMoveMethod(topeleven,start_pos,index)
+    //         $("#newarray").text(JSON.stringify(topeleven))
+    //         $('#sortable li').removeClass('highlights');
+    //     }
+    // });
+    // $( "#sortable div" ).disableSelection();
+  } );
+</script>
+ 
+ 
+</body>
+</html>
